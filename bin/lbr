@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+/**
+ * Add support for Node 0.10.x
+ */
+require('gnode');
+
+
+/**
+ * Dependencies
+ */
+var chalk = require('chalk');
+var exists = require('fs').existsSync;
+var Librarian = require('..');
+var program = require('commander');
+var resolve = require('path').resolve;
