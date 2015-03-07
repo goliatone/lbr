@@ -1,6 +1,6 @@
 'use strict';
 
-var librarian = require('../lib/librarian.js');
+var librarian = require('../lib/');
 
 /*
   ======== A Handy Little Nodeunit Reference ========
