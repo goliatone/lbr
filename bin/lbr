@@ -14,3 +14,118 @@ var exists = require('fs').existsSync;
 var Librarian = require('..');
 var program = require('commander');
 var resolve = require('path').resolve;
+
+
+/**
+ * Usage
+ */
+program.version(require('../package.json').version)
+    .option('-c, --config <path>', 'configuration file location', 'librarian.json');
+
+
+/**
+ * Examples
+ */
+program.on('--help', function(){
+    console.log('\tExamples:');
+    console.log();
+    console.log('\t\t#build from librarian.json:');
+    console.log('\t\t$ lbr');
+    console.log();
+    console.log('\t\t#build from lib/config.json:');
+    console.log('\t\t$ lbr --config lib/config.json');
+    console.log();
+});
+
+/**
+ * Parse
+ */
+program.parse(process.argv);
+
+
+/**
+ * Config
+ */
+var dir = process.cwd();
+var config = program.config;
+var path = resolve(dir, config);
+if(!exists(path)) fatal('could not find a #c# configuration file'.replace('#c#', config));
+
+try {
+    var json = require(path);
+} catch(e){
+    fatal('it seems like #f# is malformed'.replace('#f#', config));
+}
+
+/**
+ * Librarian
+ */
+var librarian = new Librarian(dir);
+if(json.source) librarian.source(json.source);
+if(json.destination) librarian.destination(json.destination);
+if(json.metadata) librarian.metadata(json.metadata);
+if(json.hasOwnProperty('clean')) librarian.clean(json.clean);
+
+
+/**
+ * Plugins
+ */
+normalize(json.plugins).forEach(function(plugin){
+    for(var name in plugin){
+        try {
+            var opts = plugin[name];
+            var local = resolve(dir, name);
+            var npm = resolve(dir, 'node_modules', name);
+            var mod = null;
+
+            if(exists(local)) mod = require(local);
+            else if(exists(local + '.js')) mod = require(local);
+            else if(exists(npm)) mod = require(npm);
+            else mod = require(name);
+
+            librarian.use(mod(opts));
+        } catch(e) {
+            fatal('failed to require plugin #p#.'.replace('#p#', name));
+        }
+    }
+});
+
+
+librarian.build(function(err){
+    if(err) return fatal(err.message, err.stack);
+    log('successfully build to ' + librarian.destination());
+});
+
+/////////////////////////////////////////////////////////////////
+/// HELPER METHODS
+/////////////////////////////////////////////////////////////////
+
+function fatal(msg, stack){
+    console.error();
+    console.error(chalk.red('\tLibrarian') + chalk.gray(': ') + msg);
+    if(stack){
+        console.error();
+        console.error(chalk.gray(stack));
+    }
+    console.error();
+    process.exit(1);
+}
+
+function log(msg){
+    console.log();
+    console.log(chalk.gray('\tLibrarian: ') + msg);
+    console.log();
+}
+
+function normalize(obj){
+    if(Array.isArray(obj)) return obj;
+
+    var out = [];
+    for(var key in obj){
+        var plugin = {};
+        plugin[key] = obj[key];
+        out.push(plugin);
+    }
+
+    return out;
+}
