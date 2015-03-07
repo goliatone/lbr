@@ -6,4 +6,4 @@ require('gnode');
 /**
  * Export `Librarian`
  */
-module.exports = require('./lib/librarian');
+module.exports = require('./lib');
