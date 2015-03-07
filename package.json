@@ -8,6 +8,9 @@
     "email": "hello@goliatone.com",
     "url": "http://goliatone.com"
   },
+  "bin": {
+    "lbr": "bin/lbr"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/goliatone/lbr.git"
@@ -36,6 +39,19 @@
   },
   "keywords": [],
   "dependencies": {
-    "gnode": "^0.1.1"
+    "gnode": "^0.1.1",
+    "is-utf8": "^0.2.0",
+    "thunkify": "^2.1.2",
+    "stat-mode": "^0.2.0",
+    "clone": "^1.0.1",
+    "is": "^3.0.1",
+    "front-matter": "^1.0.0",
+    "recursive-readdir": "^1.2.1",
+    "ware": "^1.2.0",
+    "unyield": "0.0.1",
+    "rimraf": "^2.3.1",
+    "co-fs-extra": "^1.0.1",
+    "commander": "^2.6.0",
+    "chalk": "^1.0.0"
   }
 }
