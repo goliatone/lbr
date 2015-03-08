@@ -12,6 +12,9 @@ Collect files, generate metadata, transform, and write output
 $ npm i lbr
 ```
 
+## TODO:
+- Use [matter][mt] or similar instead of frontmatter
+
 ## Documentation
 _(Coming soon)_
 
@@ -30,3 +33,4 @@ Licensed under the MIT license.
 
 
 [ms]: https://github.com/segmentio/metalsmith
+[mt]: https://www.npmjs.com/package/matter
