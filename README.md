@@ -1,13 +1,15 @@
-# librarian
+# lbr: The Librarian
 
 Collect files, generate metadata, transform, and write output
 
-## Getting Started
-Install the module with: `npm install librarian`
+## Metalsmith
+`lbr` is a fork of the magnificent [Metalsmith][ms] project.
 
-```javascript
-var librarian = require('librarian');
-librarian.awesome(); // "awesome"
+
+## Installation 
+
+```terminal
+$ npm i lbr
 ```
 
 ## Documentation
@@ -25,3 +27,6 @@ _(Nothing yet)_
 ## License
 Copyright (c) 2015 goliatone  
 Licensed under the MIT license.
+
+
+[ms]: https://github.com/segmentio/metalsmith
