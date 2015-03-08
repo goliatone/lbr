@@ -85,7 +85,6 @@ normalize(json.plugins).forEach(function(plugin){
             else mod = require(name);
 
             librarian.use(mod(opts));
-
         } catch(e) {
             fatal('failed to require plugin #p#.'.replace('#p#', name) + '\n\n' + e.message, e.stack);
         }
