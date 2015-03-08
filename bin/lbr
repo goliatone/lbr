@@ -62,6 +62,7 @@ try {
  */
 var librarian = new Librarian(dir);
 if(json.source) librarian.source(json.source);
+if(json.hasOwnProperty('frontmatter')) librarian.frontmatter(json.frontmatter);
 if(json.destination) librarian.destination(json.destination);
 if(json.metadata) librarian.metadata(json.metadata);
 if(json.hasOwnProperty('clean')) librarian.clean(json.clean);
@@ -84,8 +85,9 @@ normalize(json.plugins).forEach(function(plugin){
             else mod = require(name);
 
             librarian.use(mod(opts));
+
         } catch(e) {
-            fatal('failed to require plugin #p#.'.replace('#p#', name));
+            fatal('failed to require plugin #p#.'.replace('#p#', name) + '\n\n' + e.message, e.stack);
         }
     }
 });
