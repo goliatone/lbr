@@ -71,27 +71,17 @@ if(json.hasOwnProperty('clean')) librarian.clean(json.clean);
 /**
  * Plugins
  */
-normalize(json.plugins).forEach(function(plugin){
-    for(var name in plugin){
-        try {
-            var opts = plugin[name];
-            var local = resolve(dir, name);
-            var npm = resolve(dir, 'node_modules', name);
-            var mod = null;
+var plugins = require('../lib/plugins');
 
-            if(exists(local)) mod = require(local);
-            else if(exists(local + '.js')) mod = require(local);
-            else if(exists(npm)) mod = require(npm);
-            else mod = require(name);
-
-            librarian.use(mod(opts));
-        } catch(e) {
-            fatal('failed to require plugin #p#.'.replace('#p#', name) + '\n\n' + e.message, e.stack);
-        }
-    }
-});
+plugins({
+    root: process.cwd(),
+    handler: librarian.use.bind(librarian)
+}, json.plugins);
 
 
+/**
+ * Execute main task: build.
+ */
 librarian.build(function(err){
     if(err) return fatal(err.message, err.stack);
     log('successfully build to ' + librarian.destination());
