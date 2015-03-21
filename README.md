@@ -14,6 +14,9 @@ $ npm i lbr
 
 ## TODO:
 - Use [matter][mt] or similar instead of frontmatter
+- metalsmith-slug: Need to make toLowerCase()!
+- Metadata defaults for posts: i.e default template for article.
+- Permalinks: baseUrl + slug, for articles.
 
 ## Documentation
 _(Coming soon)_
