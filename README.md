@@ -18,6 +18,10 @@ $ npm i lbr
 - Metadata defaults for posts: i.e default template for article.
 - Permalinks: baseUrl + slug, for articles.
 
+Move to own modules:
+- **plugins**
+- **assert-is**
+
 ## Documentation
 _(Coming soon)_
 
