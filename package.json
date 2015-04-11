@@ -48,7 +48,6 @@
     "stat-mode": "^0.2.0",
     "clone": "^1.0.1",
     "is": "^3.0.1",
-    "front-matter": "^1.0.0",
     "recursive-readdir": "^1.2.1",
     "ware": "^1.2.0",
     "unyield": "0.0.1",
@@ -57,6 +56,8 @@
     "commander": "^2.6.0",
     "chalk": "^1.0.0",
     "grunt-cli": "^0.1.13",
-    "gextend": "^0.1.6"
+    "gextend": "^0.1.6",
+    "absolute": "0.0.1",
+    "gray-matter": "^2.0.0"
   }
 }
