@@ -29,16 +29,16 @@
     "node": ">= 0.10.0"
   },
   "scripts": {
-    "test": "grunt nodeunit"
+    "test": "./node_modules/mocha/bin/mocha tests/*_test.js --require co-mocha -G -w"
   },
   "devDependencies": {
-    "grunt-contrib-jshint": "~0.1.1",
-    "grunt-contrib-nodeunit": "~0.1.2",
-    "grunt-contrib-watch": "~0.2.0",
-    "grunt": "~0.4.5",
-    "mocha": "^2.2.0",
+    "mocha": "^1.18.2",
+    "mocha-clean": "^0.4.0",
+    "mocha-sinon": "^1.1.4",
+    "sinon": "^1.12.2",
+    "assert-dir-equal": "^1.0.1",
     "co-mocha": "^1.1.0",
-    "assert-dir-equal": "^1.0.1"
+    "chai": "^2.2.0"
   },
   "keywords": [],
   "dependencies": {
