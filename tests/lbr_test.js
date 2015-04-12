@@ -37,7 +37,19 @@ describe.only('LBR', function(){
         });
 
         it('should require a plugin', function(done){
-            done();
+            exec(bin, {cwd: fixture('cli-plugin-object')}, function(err, stdout){
+                if(err) return done(err);
+                equal(fixture('cli-plugin-object/build'), fixture('cli-plugin-object/expected'));
+                done();
+            });
+        });
+
+        it('should require a plugins array', function(done){
+            exec(bin, {cwd: fixture('cli-plugin-array')}, function(err, stdout){
+                if(err) return done(err);
+                equal(fixture('cli-plugin-array/build'), fixture('cli-plugin-array/expected'));
+                done();
+            });
         });
     });
 });
