@@ -43,7 +43,7 @@ describe('Librarian', function(){
         it('should add plugin to stack', function(){
             var l = Librarian();
             l.use(NOOP);
-            assert.equal(l.plugins.length, 1);
+            assert.equal(l._plugins.length, 1);
         });
     });
 
@@ -365,6 +365,17 @@ describe('Librarian', function(){
             });
             done();
         });
+
+        it('should throw if provided "source" does not exist', function(done){
+            var l = Librarian({
+                directory: 'this-should-never-ever-ever-exist'
+            });
+            assert.throws(function(){
+                l.read(function(err, files){
+                    if(err) done(err);
+                });
+            });
+        });
     });
 
     describe('∆ write', function(){
@@ -513,8 +524,10 @@ describe('Librarian', function(){
             var l = Librarian({
                 directory: fixture('build')
             });
+
             rm(fixture('build/build'));
             fs.mkdirSync(fixture('build/build'));
+
             exec('touch tests/fixtures/build/build/empty.md', function(err){
                 if(err) return done(err);
                 l.build(function(err){
@@ -530,6 +543,7 @@ describe('Librarian', function(){
                 directory: fixture('build-noclean'),
                 clean: false
             });
+
             exec('mkdir -p tests/fixtures/build-noclean/build && \
              touch tests/fixtures/build-noclean/build/empty.md', function(err){
                 if(err) return done(err);
