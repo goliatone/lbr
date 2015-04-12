@@ -3,3 +3,5 @@
 --require co-mocha
 --slow 500
 --bail
+-G
+-w
