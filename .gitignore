@@ -71,3 +71,4 @@ lbr_debug.json
 tests/fixtures/*/build
 tests/fixtures/write-dir/out
 tests/fixtures/write-mode
+tests/fixtures/cli-json/destination
