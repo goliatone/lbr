@@ -1,6 +1,9 @@
 'use strict';
 var assert = require('chai').assert;
+var fs = require('fs');
 var path = require('path');
+var fixture = path.resolve.bind(path, __dirname, 'fixtures');
+
 var Librarian = require('../');
 
 describe('Librarian', function(){
@@ -18,6 +21,18 @@ describe('Librarian', function(){
 
     it('should have a DEFAULTS object', function(){
         assert.isObject(Librarian.DEFAULTS);
+    });
+
+    it('should take an options object', function(){
+        var options = {directory:'my-directory'};
+        var l = Librarian(options);
+        assert.ok(l.directory(), 'my-directory');
+    });
+
+    it('should take a single string argument that will be the working directory', function(){
+        //this might change!
+        var l = Librarian('my-directory');
+        assert.ok(l.directory(), 'my-directory');
     });
 
     xdescribe('#use', function(){
@@ -127,7 +142,7 @@ describe('Librarian', function(){
             assert.equal(l.frontmatter(), Librarian.DEFAULTS.frontmatter);
         });
 
-        it('should set the "frontmatter" option', function(){
+        it('should initialize the "frontmatter" option', function(){
             var l = Librarian({frontmatter: true});
             assert.equal(l.frontmatter(), true)
         });
@@ -152,7 +167,7 @@ describe('Librarian', function(){
             assert.deepEqual(l.metadata(), Librarian.DEFAULTS.metadata);
         });
 
-        it('should set the "metadata" option', function(){
+        it('should initialize the "metadata" option', function(){
             var meta = {
                 user: 'goliatone',
                 url:'http://goliatone.com'
@@ -176,6 +191,155 @@ describe('Librarian', function(){
             l.metadata(meta);
             assert.notEqual(l.metadata(), meta);
             assert.deepEqual(l.metadata(), meta);
+        });
+    });
+
+    describe('#attributes', function(){
+        it('should set the "attributes" default used in DEFAULTS', function(){
+            var l = Librarian();
+            assert.deepEqual(l._attributes, Librarian.DEFAULTS.attributes);
+        });
+
+        it('should initialize the "attributes" option', function(){
+            var attributes = ['stats', 'content'];
+            var l = Librarian({attributes: attributes});
+            assert.ok(l.attributes(), attributes);
+        });
+
+        it('should get "attributes" option', function(){
+            var l = Librarian();
+            assert.deepEqual(l.attributes(), Librarian.DEFAULTS.attributes);
+        });
+
+        it('should set "attributes" option', function(){
+            var l = Librarian();
+            var attributes = ['stats', 'content'];
+            l.attributes(attributes);
+            assert.ok(l.attributes(), attributes);
+        });
+    });
+
+    describe('#path', function(){
+        it('should return a path relative to the working directory', function(){
+            var l = Librarian({source:'test/tmp'});
+            var rel = l.path('one', 'two', 'three');
+            assert.ok(rel, '/test/tmp/one/two/three');
+        });
+    });
+
+    describe('#read', function(){
+        it('should read from a source directory', function(done){
+            var l = Librarian({
+                directory: fixture('read')
+            });
+            var stats = fs.statSync(fixture('read/src/index.md'));
+
+            l.read(function(err, files){
+                if(err) return done(err);
+                assert.ok(files, {
+                    'index.md': {
+                        title: 'A Title',
+                        contents: new Buffer('body'),
+                        mode: stats.mode.toString(8).slice(-4),
+                        stats:stats,
+                        isUtf8: true
+                    }
+                });
+                done();
+            });
+        });
+
+        it('should read from a provided directory', function(done){
+            var l = Librarian({
+                directory: fixture('read-dir')
+            });
+            var stats = fs.statSync(fixture('read-dir/dir/index.md'));
+            var dir = fixture('read-dir/dir');
+            l.read(dir, function(err, files){
+                if(err) done(err);
+                assert.ok(files, {
+                    'index.md': {
+                        title: 'A Title',
+                        contents: new Buffer('body'),
+                        mode: stats.mode.toString(8).slice(-4),
+                        stats:stats,
+                        isUtf8: true
+                    }
+                });
+            });
+            done();
+        });
+
+        it('should preserve an existing file mode', function(done){
+            var l = Librarian({
+                directory: fixture('read-mode')
+            });
+            var stats = fs.statSync(fixture('read-mode/src/bin'));
+
+            l.read(function(err, files){
+                if(err) done(err);
+                assert.ok(files, {
+                    'bin': {
+                        contents: new Buffer('echo test'),
+                        mode: stats.mode.toString(8).slice(-4),
+                        stats: stats,
+                        isUtf8: false
+                    }
+                });
+            });
+            done();
+        });
+
+        describe('should expose isUtf8 metadata property', function(){
+            it('should be false for binary files', function(done){
+                var l = Librarian({
+                    directory: fixture('read-isUtf8-false')
+                });
+
+                l.read(function(err, files){
+                    if(err) done(err);
+                    assert.isFalse(files['image.png'].isUtf8);
+                });
+                done();
+            });
+
+            it('should be true for text files', function(done){
+                var l = Librarian({
+                    directory: fixture('read-isUtf8-true')
+                });
+
+                l.read(function(err, files){
+                    if(err) done(err);
+                    assert.isTrue(files['index.md'].isUtf8);
+                });
+                done();
+            });
+        });
+
+        it('should expose attributes in each file metadata', function(done){
+            var l = Librarian({
+                directory: fixture('expose-attributes')
+            });
+            l.read(function(err, files){
+                if(err) done(err);
+                var file = files['index.md'];
+                Librarian.DEFAULTS.attributes.map(function(attr){
+                    assert.property(file, attr, attr);
+                });
+            });
+            done();
+        });
+
+        it('should not parse front-matter if "frontmatter" is false', function(done){
+            var l = Librarian({
+                directory: fixture('read-frontmatter'),
+                frontmatter: false
+            });
+            l.read(function(err, files){
+                if(err) done(err);
+                assert.isUndefined(files['index.md'].title);
+            });
+            done();
         });
     });
 });
