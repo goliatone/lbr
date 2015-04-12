@@ -27,5 +27,17 @@ describe.only('LBR', function(){
                 done();
             });
         });
+
+        it('should grab config from -c flag', function(done){
+            exec(bin + ' -c config.json', {cwd: fixture('cli-alt-json')}, function(err, std){
+                if(err) return done(err);
+                equal(fixture('cli-alt-json/destination'), fixture('cli-alt-json/expected'));
+                done();
+            });
+        });
+
+        it('should require a plugin', function(done){
+            done();
+        });
     });
 });
