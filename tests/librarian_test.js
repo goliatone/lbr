@@ -2,6 +2,7 @@
 var assert = require('chai').assert;
 var fs = require('fs');
 var path = require('path');
+var Mode = require('stat-mode');
 var equal = require('assert-dir-equal');
 var fixture = path.resolve.bind(path, __dirname, 'fixtures');
 
@@ -36,7 +37,7 @@ describe('Librarian', function(){
         assert.ok(l.directory(), 'my-directory');
     });
 
-    xdescribe('#use', function(){
+    describe('∆ use', function(){
         it('should add plugin to stack', function(){
             var l = Librarian();
             l.use(NOOP);
@@ -44,7 +45,7 @@ describe('Librarian', function(){
         });
     });
 
-    describe('#directory', function(){
+    describe('∆ directory', function(){
 
         it('should set a working directory by default equal to process.env.PWD', function(){
             var l = Librarian();
@@ -62,7 +63,7 @@ describe('Librarian', function(){
         });
     });
 
-    describe('#source', function(){
+    describe('∆ source', function(){
         it('should set a "source" directory in DEFAULTS', function(){
             var l = Librarian();
             assert.ok(l.source(), Librarian.DEFAULTS.source);
@@ -92,7 +93,7 @@ describe('Librarian', function(){
         });
     });
 
-    describe('#destination', function(){
+    describe('∆ destination', function(){
         it('should set a destination directory in DEFAULTS', function(){
             var l = Librarian();
             assert.ok(l.destination(), Librarian.DEFAULTS.destination);
@@ -117,10 +118,10 @@ describe('Librarian', function(){
         });
     });
 
-    describe('#clean', function(){
+    describe('∆ clean', function(){
         it('should set the "clean" default used in DEFAULTS', function(){
             var l = Librarian();
-            assert.equal(l.clean(), Librarian.DEFAULTS.clean);
+            assert.equal(l._clean, Librarian.DEFAULTS.clean);
         });
 
         it('should set the "clean" option', function(){
@@ -137,7 +138,27 @@ describe('Librarian', function(){
         });
     });
 
-    describe('#frontmatter', function(){
+    describe('∆ debug', function(){
+        it('should set the "debug" default used in DEFAULTS', function(){
+            var l = Librarian();
+            assert.equal(l._debug, Librarian.DEFAULTS.debug);
+        });
+
+        it('should set the "clean" option', function(){
+            var l = Librarian();
+            l.debug(false);
+            assert.equal(l.debug(), false);
+        });
+
+        it('should throw on on boolean', function(){
+            var l = Librarian();
+            assert.throws(function(){
+                l.debug(23);
+            });
+        });
+    });
+
+    describe('∆ frontmatter', function(){
         it('should set the "frontmatter" default used in DEFAULTS', function(){
             var l = Librarian();
             assert.equal(l.frontmatter(), Librarian.DEFAULTS.frontmatter);
@@ -162,7 +183,7 @@ describe('Librarian', function(){
         });
     });
 
-    describe('#metadata', function(){
+    describe('∆ metadata', function(){
         it('should set the "metadata" default used in DEFAULTS', function(){
             var l = Librarian();
             assert.deepEqual(l.metadata(), Librarian.DEFAULTS.metadata);
@@ -195,7 +216,7 @@ describe('Librarian', function(){
         });
     });
 
-    describe('#attributes', function(){
+    describe('∆ attributes', function(){
         it('should set the "attributes" default used in DEFAULTS', function(){
             var l = Librarian();
             assert.deepEqual(l._attributes, Librarian.DEFAULTS.attributes);
@@ -220,7 +241,7 @@ describe('Librarian', function(){
         });
     });
 
-    describe('#path', function(){
+    describe('∆ path', function(){
         it('should return a path relative to the working directory', function(){
             var l = Librarian({source:'test/tmp'});
             var rel = l.path('one', 'two', 'three');
@@ -228,7 +249,7 @@ describe('Librarian', function(){
         });
     });
 
-    describe('#read', function(){
+    describe('∆ read', function(){
         it('should read from a source directory', function(done){
             var l = Librarian({
                 directory: fixture('read')
@@ -344,7 +365,7 @@ describe('Librarian', function(){
         });
     });
 
-    describe('#write', function(){
+    describe('∆ write', function(){
         it('should write to a destination directory', function(done){
             var l = Librarian({
                 directory: fixture('write')
@@ -369,5 +390,109 @@ describe('Librarian', function(){
                 done();
             });
         });
+
+        it('should chmod an optional mode from file metadata', function(done){
+            var l = Librarian({
+                directory: fixture('write-mode')
+            });
+            var files = {
+                'bin':{
+                    contents: new Buffer('echo test'),
+                    mode: '0777'
+                }
+            };
+
+            l.write(files, function(err){
+                if(err) return done(err);
+                var stats = fs.statSync(fixture('write-mode/build/bin'));
+                var mode = Mode(stats).toOctal();
+                assert.equal(mode, '0777');
+                done();
+            });
+        });
+    });
+
+    describe('∆ run', function(){
+        it('should apply a plugin', function(done){
+            var l = Librarian();
+            l.use(plugin);
+            l.run({one: 'one'}, function(err, files, lbr){
+                assert.property(files, 'one');
+                assert.property(files, 'two');
+                done();
+            });
+
+            function plugin(files, lbr, next){
+                assert.property(files, 'one');
+                assert.equal(l, lbr);
+                assert.isFunction(next);
+                files.two = 'two';
+                next();
+            }
+        });
+
+        it('should run with a provided plugin', function(done){
+            var l = Librarian();
+            //TODO: Review, how does it work? run takes two args?!
+            l.run({one:'one'}, [plugin], function(err, files, lbr){
+                assert.property(files, 'one');
+                assert.property(files, 'two');
+                done();
+            });
+
+            function plugin(files, lbr, next){
+                assert.property(files, 'one');
+                assert.equal(l, lbr);
+                assert.isFunction(next);
+                files.two = 'two';
+                next();
+            }
+        });
+
+        it('should support synchronous plugins', function(done){
+            var l = Librarian();
+            l.use(plugin);
+            l.run({one: 'one'}, function(err, files, lbr){
+                assert.property(files, 'one');
+                assert.property(files, 'two');
+                done();
+            });
+
+            function plugin(files, lbr){
+                assert.property(files, 'one');
+                assert.equal(l, lbr);
+                files.two = 'two';
+            }
+        });
+    });
+
+    describe('∆ build', function(){
+        it('should do a basic copy with no plugins', function(done){
+            Librarian({
+                directory:fixture('basic')
+                // ,debug:true
+            }).build(function(err, files){
+                if(err) return done(err);
+                assert.isObject(files);
+                equal(fixture('basic/build'), fixture('basic/expected'));
+                done();
+            });
+        });
+        it('should preserve binary files', function(done){
+            Librarian({
+                directory:fixture('basic-images')
+                // ,debug:true
+            }).build(function(err, files){
+                if(err) return done(err);
+                assert.isObject(files);
+                equal(fixture('basic-images/build'), fixture('basic-images/expected'));
+                done();
+            });
+        });
+    });
+
+    describe('∆ debugBuild', function(){
+        xit('should have configurable output path', function(){});
+        xit('should generate metadata file', function(done){});
     });
 });
