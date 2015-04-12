@@ -65,3 +65,6 @@ results
 npm-debug.log
 node_modules
 
+#tests
+tests/fixtures/write/build
+tests/fixtures/write-dir/out
