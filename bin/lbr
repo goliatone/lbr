@@ -49,7 +49,7 @@ program.parse(process.argv);
 var dir = process.cwd();
 var config = program.config;
 var path = resolve(dir, config);
-if(!exists(path)) fatal('could not find a #c# configuration file'.replace('#c#', config));
+if(!exists(path)) fatal('could not find a "#c#" configuration file'.replace('#c#', config));
 
 try {
     var json = require(path);
@@ -60,12 +60,7 @@ try {
 /**
  * Librarian
  */
-var librarian = new Librarian(dir);
-if(json.source) librarian.source(json.source);
-if(json.hasOwnProperty('frontmatter')) librarian.frontmatter(json.frontmatter);
-if(json.destination) librarian.destination(json.destination);
-if(json.metadata) librarian.metadata(json.metadata);
-if(json.hasOwnProperty('clean')) librarian.clean(json.clean);
+var librarian = new Librarian(json);
 
 
 /**
@@ -77,6 +72,19 @@ plugins({
     root: process.cwd(),
     handler: librarian.use.bind(librarian)
 }, json.plugins);
+
+
+// var watch = require('metalsmith-watch');
+// librarian.use(watch({
+//     pattern : '**/*',
+//     livereload: true
+// }));
+
+// var serve = require('metalsmith-serve');
+// librarian.use(serve({
+//     port: 8081,
+//     verbose: true
+// }));
 
 
 /**
