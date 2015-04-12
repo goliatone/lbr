@@ -1,0 +1,9 @@
+{
+  "plugins":[
+    {
+      "./plugins/noop": {}
+    },
+    {
+      "./plugins/noop2": {}
+    }]
+}
