@@ -3,7 +3,9 @@ var assert = require('chai').assert;
 var fs = require('fs');
 var path = require('path');
 var Mode = require('stat-mode');
+var rm = require('rimraf').sync;
 var equal = require('assert-dir-equal');
+var exec = require('child_process').exec;
 var fixture = path.resolve.bind(path, __dirname, 'fixtures');
 
 var Librarian = require('../');
@@ -469,7 +471,7 @@ describe('Librarian', function(){
     describe('∆ build', function(){
         it('should do a basic copy with no plugins', function(done){
             Librarian({
-                directory:fixture('basic')
+                directory: fixture('basic')
                 // ,debug:true
             }).build(function(err, files){
                 if(err) return done(err);
@@ -480,13 +482,63 @@ describe('Librarian', function(){
         });
         it('should preserve binary files', function(done){
             Librarian({
-                directory:fixture('basic-images')
-                // ,debug:true
+                directory: fixture('basic-images')
             }).build(function(err, files){
                 if(err) return done(err);
                 assert.isObject(files);
                 equal(fixture('basic-images/build'), fixture('basic-images/expected'));
                 done();
+            });
+        });
+
+        it('should apply a plugin', function(done){
+            Librarian({
+                directory: fixture('basic-plugin')
+            }).use(function(files, lbr, next){
+                Object.keys(files).forEach(function(file){
+                    var data = files[file];
+                    data.contents = new Buffer(data.title);
+                });
+                next();
+            })
+            .build(function(err, files){
+                if(err) return done(err);
+                assert.isObject(files);
+                equal(fixture('basic-plugin/build'), fixture('basic-plugin/expected'));
+                done();
+            });
+        });
+
+        it('should remove an existing build directory', function(done){
+            var l = Librarian({
+                directory: fixture('build')
+            });
+            rm(fixture('build/build'));
+            fs.mkdirSync(fixture('build/build'));
+            exec('touch tests/fixtures/build/build/empty.md', function(err){
+                if(err) return done(err);
+                l.build(function(err){
+                    if(err) return done(err);
+                    equal(fixture('build/build'), fixture('build/expected'));
+                    done();
+                });
+            });
+        });
+
+        it('should not remove an existing build directory if "clean" is false', function(done){
+            var l = Librarian({
+                directory: fixture('build-noclean'),
+                clean: false
+            });
+            exec('mkdir -p tests/fixtures/build-noclean/build && \
+             touch tests/fixtures/build-noclean/build/empty.md', function(err){
+                if(err) return done(err);
+                var files = {'index.md': {contents: new Buffer('body')}};
+                l.build(function(err){
+                    if(err) return done(err);
+                    equal(fixture('build-noclean/build'), fixture('build-noclean/expected'));
+                    done();
+                });
             });
         });
     });
