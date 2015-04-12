@@ -2,6 +2,7 @@
 var assert = require('chai').assert;
 var fs = require('fs');
 var path = require('path');
+var equal = require('assert-dir-equal');
 var fixture = path.resolve.bind(path, __dirname, 'fixtures');
 
 var Librarian = require('../');
@@ -290,7 +291,7 @@ describe('Librarian', function(){
             done();
         });
 
-        describe('should expose isUtf8 metadata property', function(){
+        describe('should expose isUtf8 "metadata" property', function(){
             it('should be false for binary files', function(done){
                 var l = Librarian({
                     directory: fixture('read-isUtf8-false')
@@ -316,7 +317,7 @@ describe('Librarian', function(){
             });
         });
 
-        it('should expose attributes in each file metadata', function(done){
+        it('should expose attributes in each file "metadata"', function(done){
             var l = Librarian({
                 directory: fixture('expose-attributes')
             });
@@ -340,6 +341,33 @@ describe('Librarian', function(){
                 assert.isUndefined(files['index.md'].title);
             });
             done();
+        });
+    });
+
+    describe('#write', function(){
+        it('should write to a destination directory', function(done){
+            var l = Librarian({
+                directory: fixture('write')
+            });
+            var files = {'index.md':{contents: new Buffer('body')}};
+            l.write(files, function(err){
+                if(err) return done(err);
+                equal(fixture('write/build'), fixture('write/expected'));
+                done();
+            });
+        });
+
+        it('should write to a provided directory', function(done){
+            var l = Librarian({
+                directory: fixture('write-dir')
+            });
+            var files = {'index.md':{contents: new Buffer('body')}};
+            var dir = fixture('write-dir/out');
+            l.write(files, dir, function(err){
+                if(err) return done(err);
+                equal(fixture('write-dir/out'), fixture('write-dir/expected'));
+                done();
+            });
         });
     });
 });
