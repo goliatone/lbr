@@ -65,6 +65,9 @@ results
 npm-debug.log
 node_modules
 
+lbr_debug.json
+
 #tests
-tests/fixtures/write/build
+tests/fixtures/*/build
 tests/fixtures/write-dir/out
+tests/fixtures/write-mode
