@@ -8,7 +8,7 @@ var equal = require('assert-dir-equal');
 var exec = require('child_process').exec;
 var fixture = path.resolve.bind(path, __dirname, 'fixtures');
 
-describe.only('LBR', function(){
+describe('LBR', function(){
     var bin = path.resolve(__dirname, '../bin/lbr');
 
     describe('build', function(){
@@ -44,10 +44,43 @@ describe.only('LBR', function(){
             });
         });
 
+        it.only('should require a npm installed plugin', function(done){
+
+            rm('node_modules/cli-plugin-npm');
+            var cwd = {cwd: fixture('cli-plugin-npm')};
+
+            exec('mkdir -p node_modules/cli-plugin-npm/noop && \
+                cp tests/fixtures/cli-plugin-npm/noop/index.js node_modules/cli-plugin-npm/noop', function(err){
+                if(err) return done(err);
+                exec(bin, cwd, function(err, stdout){
+                    if(err) return done(err);
+                    equal(fixture('cli-plugin-npm/build'), fixture('cli-plugin-npm/expected'));
+                    done();
+                });
+            });
+        });
+
         it('should require a plugins array', function(done){
             exec(bin, {cwd: fixture('cli-plugin-array')}, function(err, stdout){
                 if(err) return done(err);
                 equal(fixture('cli-plugin-array/build'), fixture('cli-plugin-array/expected'));
+                done();
+            });
+        });
+
+        it('should throw when a plugin is not found', function(done){
+            exec(bin, {cwd: fixture('cli-no-plugin')}, function(err, stdout){
+                assert(err);
+                assert.include(err.message, 'Failed to require plugin: ./plugins/not-a-valid-plugin');
+                done();
+            });
+        });
+
+        it('should trhow when using a broken plugin', function(done){
+            exec(bin, {cwd: fixture('cli-broken-plugin')}, function(err){
+                assert(err);
+                assert.include(err.message, 'Error running plugin: ./plugins/broken-plugin');
+                assert.include(err.message, 'Broken plugin error');
                 done();
             });
         });
