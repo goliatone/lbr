@@ -370,10 +370,9 @@ describe('Librarian', function(){
             var l = Librarian({
                 directory: 'this-should-never-ever-ever-exist'
             });
-            assert.throws(function(){
-                l.read(function(err, files){
-                    if(err) done(err);
-                });
+            l.read(function(err){
+                assert(err);
+                done();
             });
         });
     });
