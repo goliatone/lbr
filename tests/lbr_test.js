@@ -44,7 +44,7 @@ describe('LBR', function(){
             });
         });
 
-        it.only('should require a npm installed plugin', function(done){
+        it('should require a npm installed plugin', function(done){
 
             rm('node_modules/cli-plugin-npm');
             var cwd = {cwd: fixture('cli-plugin-npm')};
