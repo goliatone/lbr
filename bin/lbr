@@ -66,12 +66,12 @@ var librarian = new Librarian(json);
 /**
  * Plugins
  */
-var plugins = require('../lib/plugins');
+var plugins = require('in');
 
-plugins({
+plugins(json.plugins, {
     root: process.cwd(),
     handler: librarian.use.bind(librarian)
-}, json.plugins);
+});
 
 
 // var watch = require('metalsmith-watch');
