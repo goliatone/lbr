@@ -49,8 +49,7 @@ describe('LBR', function(){
             rm('node_modules/cli-plugin-npm');
             var cwd = {cwd: fixture('cli-plugin-npm')};
 
-            exec('mkdir -p node_modules/cli-plugin-npm/noop && \
-                cp tests/fixtures/cli-plugin-npm/noop/index.js node_modules/cli-plugin-npm/noop', function(err){
+            exec('cp -r test/fixtures/cli-plugin-npm node_modules', function(err){
                 if(err) return done(err);
                 exec(bin, cwd, function(err, stdout){
                     if(err) return done(err);
