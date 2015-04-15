@@ -1,7 +1,7 @@
 {
   "name": "lbr",
   "description": "Collect files, generate metadata, transform, and write output",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "homepage": "https://github.com/goliatone/lbr",
   "author": {
     "name": "goliatone",
