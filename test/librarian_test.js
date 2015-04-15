@@ -527,7 +527,7 @@ describe('Librarian', function(){
             rm(fixture('build/build'));
             fs.mkdirSync(fixture('build/build'));
 
-            exec('touch tests/fixtures/build/build/empty.md', function(err){
+            exec('touch test/fixtures/build/build/empty.md', function(err){
                 if(err) return done(err);
                 l.build(function(err){
                     if(err) return done(err);
@@ -543,8 +543,8 @@ describe('Librarian', function(){
                 clean: false
             });
 
-            exec('mkdir -p tests/fixtures/build-noclean/build && \
-             touch tests/fixtures/build-noclean/build/empty.md', function(err){
+            exec('mkdir -p test/fixtures/build-noclean/build && \
+             touch test/fixtures/build-noclean/build/empty.md', function(err){
                 if(err) return done(err);
                 var files = {'index.md': {contents: new Buffer('body')}};
                 l.build(function(err){
