@@ -20,6 +20,7 @@ var resolve = require('path').resolve;
  * Usage
  */
 program.version(require('../package.json').version)
+    .option('-s, --source <path>', 'Execution context', process.cwd())
     .option('-c, --config <path>', 'configuration file location', 'librarian.json');
 
 
@@ -46,7 +47,7 @@ program.parse(process.argv);
 /**
  * Config
  */
-var dir = process.cwd();
+var dir = program.source;
 var config = program.config;
 var path = resolve(dir, config);
 if(!exists(path)) fatal('could not find a "#c#" configuration file'.replace('#c#', config));
