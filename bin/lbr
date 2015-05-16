@@ -21,6 +21,7 @@ var resolve = require('path').resolve;
  */
 program.version(require('../package.json').version)
     .option('-s, --source <path>', 'Execution context', process.cwd())
+    .option('-t, --debug', 'Enable debug')
     .option('-c, --config <path>', 'configuration file location', 'librarian.json');
 
 
