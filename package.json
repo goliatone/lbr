@@ -60,6 +60,7 @@
     "gextend": "^0.1.6",
     "absolute": "0.0.1",
     "gray-matter": "^2.0.0",
-    "in": "*"
+    "in": "*",
+    "assert-is": "^0.4.0"
   }
 }
